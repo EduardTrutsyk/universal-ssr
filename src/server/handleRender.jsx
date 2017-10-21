@@ -1,4 +1,9 @@
-function renderFullPage() {
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+
+import App from '../client/app';
+
+function renderFullPage(html) {
   return `
       <!doctype html>
       <html>
@@ -7,7 +12,7 @@ function renderFullPage() {
           <title>React Server Side Rendering</title>
         </head>
         <body>
-          <div id="root"></div>
+          <div id="root">${html}</div>
           <script src="/js/bundle.js"></script>
         </body>
       </html>
@@ -15,7 +20,9 @@ function renderFullPage() {
 }
 
 function handleRender(req, res) {
-  res.send(renderFullPage());
+  const html = renderToString(<App name="World" />);
+
+  res.send(renderFullPage(html));
 }
 
 export default handleRender;
