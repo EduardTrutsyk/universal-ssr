@@ -1,0 +1,40 @@
+{
+  "name": "ssr",
+  "version": "1.0.0",
+  "description": "Server Side Rendering with ReactJS, React Router v4, Redux",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack -d",
+    "start": "npm run dev && babel-node ./src/server",
+    "lint": "eslint '*'"
+  },
+  "keywords": [
+    "ssr",
+    "reactjs",
+    "redux",
+    "react-router"
+  ],
+  "author": "Eduard_Trutsyk",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^4.9.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
+    "nodemon": "^1.12.1",
+    "webpack": "^3.8.1"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "prop-types": "^15.6.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-router-dom": "^4.2.2"
+  }
+}
