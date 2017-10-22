@@ -17,6 +17,10 @@ class UsersPage extends Component {
     loading: false,
   };
 
+  static fetchData(dispatch) {
+    return dispatch(fetchUsers());
+  }
+
   componentDidMount() {
     this.props.fetchUsers();
   }
@@ -26,7 +30,7 @@ class UsersPage extends Component {
     return (
       <div>
         <h2>UsersPage</h2>
-        {loading ? <div>Loading...</div> : <Users items={users} />}
+        {loading && !users.length ? <div>Loading...</div> : <Users items={users} />}
       </div>
     );
   }

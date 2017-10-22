@@ -21,7 +21,7 @@ export const updateCurrentUser = user => ({
 export const fetchUsers = () => (dispatch) => {
   dispatch(loadUsers());
 
-  fetch('http://jsonplaceholder.typicode.com/users')
+  return fetch('http://jsonplaceholder.typicode.com/users')
     .then(res => res.json())
     .then(users => dispatch(updateUsers(users)));
 };
@@ -29,7 +29,7 @@ export const fetchUsers = () => (dispatch) => {
 export const fetchUserById = userId => (dispatch) => {
   dispatch(loadUsers());
 
-  fetch(`http://jsonplaceholder.typicode.com/users/${userId}`)
+  return fetch(`http://jsonplaceholder.typicode.com/users/${userId}`)
     .then(res => res.json())
     .then(users => dispatch(updateCurrentUser(users)));
 };
@@ -47,6 +47,7 @@ export default (state = INITIAL_STATE, action = {}) => {
       return {
         ...state,
         loading: true,
+        current: null,
       };
     case UPDATE_USERS:
       return {

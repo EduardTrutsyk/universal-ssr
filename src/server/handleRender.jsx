@@ -2,7 +2,9 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { matchRoutes } from 'react-router-config';
 
+import routes from '../client/routes';
 import configureStore from '../client/configureStore';
 import App from '../client/app';
 
@@ -29,26 +31,41 @@ function renderFullPage(html, preloadedState) {
 
 function handleRender(req, res) {
   const store = configureStore();
-  const context = {};
-  const app = (
-    <Provider store={store}>
-      <StaticRouter location={req.url} context={context} >
-        <App name="World" />
-      </StaticRouter>
-    </Provider>
-  );
 
-  const html = renderToString(app);
+  const branch = matchRoutes(routes, req.url);
+  const promises = branch.map(({ route, match }) => {
+    const { fetchData } = route.component;
 
-  if (context.url) {
-    // Somewhere a `<Redirect>` was rendered
-    return res.redirect(context.url);
-  }
+    if (!(fetchData instanceof Function)) {
+      return Promise.resolve(null);
+    }
 
-  // Grab the initial state from our Redux store
-  const preloadedState = store.getState();
+    return fetchData(store.dispatch, match);
+  });
 
-  return res.send(renderFullPage(html, preloadedState));
+  return Promise.all(promises)
+    .then(() => {
+      const context = {};
+      const app = (
+        <Provider store={store}>
+          <StaticRouter location={req.url} context={context} >
+            <App name="World" />
+          </StaticRouter>
+        </Provider>
+      );
+
+      const html = renderToString(app);
+
+      if (context.url) {
+        // Somewhere a `<Redirect>` was rendered
+        return res.redirect(context.url);
+      }
+
+      // Grab the initial state from our Redux store
+      const preloadedState = store.getState();
+
+      return res.send(renderFullPage(html, preloadedState));
+    });
 }
 
 export default handleRender;

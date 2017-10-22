@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import { fetchUserById } from '../modules/users';
-import User from '../components/Users/User';
 
 class UserPage extends Component {
   static propTypes = {
@@ -25,6 +24,10 @@ class UserPage extends Component {
     loading: false,
   };
 
+  static fetchData(dispatch, match) {
+    return dispatch(fetchUserById(match.params.userId));
+  }
+
   componentDidMount() {
     this.props.fetchUserById(this.props.match.params.userId);
   }
@@ -34,7 +37,7 @@ class UserPage extends Component {
     return (
       <div>
         <h2>UserPage</h2>
-        {loading ? <div>Loading...</div> : <pre>{JSON.stringify(user, null, 2)}</pre>}
+        {loading && !user ? <div>Loading...</div> : <pre>{JSON.stringify(user, null, 2)}</pre>}
       </div>
     );
   }
