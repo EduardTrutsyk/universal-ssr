@@ -1,10 +1,12 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
 
+import configureStore from '../client/configureStore';
 import App from '../client/app';
 
-function renderFullPage(html) {
+function renderFullPage(html, preloadedState) {
   return `
       <!doctype html>
       <html>
@@ -14,6 +16,11 @@ function renderFullPage(html) {
         </head>
         <body>
           <div id="root">${html}</div>
+          <script>
+            // WARNING: See the following for security issues around embedding JSON in HTML:
+            // http://redux.js.org/docs/recipes/ServerRendering.html#security-considerations
+            window.PRELOADED_STATE = ${JSON.stringify(preloadedState).replace(/</g, '\\u003c')}
+          </script>
           <script src="/js/bundle.js"></script>
         </body>
       </html>
@@ -21,11 +28,14 @@ function renderFullPage(html) {
 }
 
 function handleRender(req, res) {
+  const store = configureStore();
   const context = {};
   const app = (
-    <StaticRouter location={req.url} context={context} >
-      <App name="World" />
-    </StaticRouter>
+    <Provider store={store}>
+      <StaticRouter location={req.url} context={context} >
+        <App name="World" />
+      </StaticRouter>
+    </Provider>
   );
 
   const html = renderToString(app);
@@ -35,7 +45,10 @@ function handleRender(req, res) {
     return res.redirect(context.url);
   }
 
-  return res.send(renderFullPage(html));
+  // Grab the initial state from our Redux store
+  const preloadedState = store.getState();
+
+  return res.send(renderFullPage(html, preloadedState));
 }
 
 export default handleRender;

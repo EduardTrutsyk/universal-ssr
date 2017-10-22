@@ -4,6 +4,7 @@ import { Route, Link, Switch, Redirect } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
 import UsersPage from './pages/UsersPage';
+import UserPage from './pages/UserPage';
 
 const App = ({ name }) => (
   <div>
@@ -14,6 +15,7 @@ const App = ({ name }) => (
     </ul>
     <Switch>
       <Route exact path="/" component={HomePage} />
+      <Route path="/users/:userId" component={UserPage} />
       <Route path="/users" component={UsersPage} />
       <Redirect to="/" />
     </Switch>
