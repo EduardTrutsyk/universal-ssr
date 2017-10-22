@@ -17,11 +17,7 @@ class UsersPage extends Component {
     loading: false,
   };
 
-  static fetchData(dispatch) {
-    return dispatch(fetchUsers());
-  }
-
-  componentDidMount() {
+  componentWillMount() {
     this.props.fetchUsers();
   }
 

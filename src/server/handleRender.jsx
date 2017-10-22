@@ -2,9 +2,8 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { matchRoutes } from 'react-router-config';
 
-import routes from '../client/routes';
+import rootSaga from '../client/modules/rootSaga';
 import configureStore from '../client/configureStore';
 import App from '../client/app';
 
@@ -32,40 +31,34 @@ function renderFullPage(html, preloadedState) {
 function handleRender(req, res) {
   const store = configureStore();
 
-  const branch = matchRoutes(routes, req.url);
-  const promises = branch.map(({ route, match }) => {
-    const { fetchData } = route.component;
+  const context = {};
+  const app = (
+    <Provider store={store}>
+      <StaticRouter location={req.url} context={context} >
+        <App name="World" />
+      </StaticRouter>
+    </Provider>
+  );
 
-    if (!(fetchData instanceof Function)) {
-      return Promise.resolve(null);
+  store.runSaga(rootSaga).done.then(() => {
+    const html = renderToString(app);
+
+    if (context.url) {
+      // Somewhere a `<Redirect>` was rendered
+      return res.redirect(context.url);
     }
 
-    return fetchData(store.dispatch, match);
+    // Grab the initial state from our Redux store
+    const preloadedState = store.getState();
+
+    return res.send(renderFullPage(html, preloadedState));
   });
 
-  return Promise.all(promises)
-    .then(() => {
-      const context = {};
-      const app = (
-        <Provider store={store}>
-          <StaticRouter location={req.url} context={context} >
-            <App name="World" />
-          </StaticRouter>
-        </Provider>
-      );
+  // Do first render, starts initial actions.
+  renderToString(app);
 
-      const html = renderToString(app);
-
-      if (context.url) {
-        // Somewhere a `<Redirect>` was rendered
-        return res.redirect(context.url);
-      }
-
-      // Grab the initial state from our Redux store
-      const preloadedState = store.getState();
-
-      return res.send(renderFullPage(html, preloadedState));
-    });
+  // When the first render is finished, send the END action to redux-saga.
+  store.close();
 }
 
 export default handleRender;

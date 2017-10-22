@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link, Switch } from 'react-router-dom';
-import { renderRoutes } from 'react-router-config';
+import { Route, Link, Switch, Redirect } from 'react-router-dom';
 import 'isomorphic-fetch';
 
-
-import routes from './routes';
+import HomePage from './pages/HomePage';
+import UsersPage from './pages/UsersPage';
+import UserPage from './pages/UserPage';
 
 const App = ({ name }) => (
   <div>
@@ -15,7 +15,10 @@ const App = ({ name }) => (
       <li><Link to="/users">Users</Link></li>
     </ul>
     <Switch>
-      {renderRoutes(routes)}
+      <Route exact path="/" component={HomePage} />
+      <Route path="/users/:userId" component={UserPage} />
+      <Route path="/users" component={UsersPage} />
+      <Redirect to="/" />
     </Switch>
   </div>
 );

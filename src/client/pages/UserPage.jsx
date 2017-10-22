@@ -24,11 +24,7 @@ class UserPage extends Component {
     loading: false,
   };
 
-  static fetchData(dispatch, match) {
-    return dispatch(fetchUserById(match.params.userId));
-  }
-
-  componentDidMount() {
+  componentWillMount() {
     this.props.fetchUserById(this.props.match.params.userId);
   }
 
